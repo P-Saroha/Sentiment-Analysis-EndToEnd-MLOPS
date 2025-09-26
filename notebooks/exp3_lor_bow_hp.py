@@ -21,10 +21,26 @@ warnings.filterwarnings("ignore")
 # os.environ["MLFLOW_DISABLE_ARTIFACTS_DOWNLOAD"] = "1"
 
 # Set MLflow Tracking URI & DAGsHub integration
-MLFLOW_TRACKING_URI = "https://dagshub.com/P-Saroha/Sentiment-Analysis-EndToEnd-MLOPS.mlflow"
-dagshub.init(repo_owner="P-Saroha", repo_name="Sentiment-Analysis-EndToEnd-MLOPS", mlflow=True)
-mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
-mlflow.set_experiment("LoR Hyperparameter Tuning")
+def setup_mlflow():
+    """Setup MLflow with fallback to local tracking if DagHub is unavailable."""
+    MLFLOW_TRACKING_URI = "https://dagshub.com/P-Saroha/Sentiment-Analysis-EndToEnd-MLOPS.mlflow"
+    try:
+        # Try to connect to DagHub
+        dagshub.init(repo_owner="P-Saroha", repo_name="Sentiment-Analysis-EndToEnd-MLOPS", mlflow=True)
+        mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
+        mlflow.set_experiment("LoR Hyperparameter Tuning")
+        print("✓ Connected to DagHub MLflow tracking")
+        return True
+    except Exception as e:
+        print(f"⚠ Failed to connect to DagHub: {e}")
+        print("📁 Falling back to local MLflow tracking")
+        # Fallback to local tracking
+        mlflow.set_tracking_uri("file:./mlruns")
+        mlflow.set_experiment("LoR Hyperparameter Tuning")
+        return False
+
+# Setup MLflow with error handling
+dagshub_connected = setup_mlflow()
 
 
 # ==========================
@@ -105,23 +121,54 @@ def train_and_log_model(X_train, X_test, y_train, y_test, vectorizer):
                 mlflow.log_params(params)
                 mlflow.log_metrics(metrics)
                 
-                print(f"Params: {params} | Accuracy: {metrics['accuracy']:.4f} | F1: {metrics['f1_score']:.4f}")
+                print(f"🔍 Params: {params}")
+                print(f"📊 Accuracy: {metrics['accuracy']:.4f} | F1: {metrics['f1_score']:.4f} | CV Score: {mean_score:.4f} ± {std_score:.4f}")
+                print("-" * 80)
 
-        # Log the best model
+        # Log the best model with error handling
         best_params = grid_search.best_params_
         best_model = grid_search.best_estimator_
         best_f1 = grid_search.best_score_
 
         mlflow.log_params(best_params)
         mlflow.log_metric("best_f1_score", best_f1)
-        mlflow.sklearn.log_model(best_model, "model")
         
-        print(f"\nBest Params: {best_params} | Best F1 Score: {best_f1:.4f}")
+        # Try to log the model with error handling
+        try:
+            mlflow.sklearn.log_model(best_model, "model")
+            print("✅ Model logged successfully to MLflow")
+        except Exception as model_log_error:
+            print(f"⚠ Warning: Could not log model to remote tracking: {model_log_error}")
+            print("📊 Metrics and parameters were still logged successfully")
+        
+        print(f"\n🏆 Best Hyperparameters: {best_params}")
+        print(f"🎯 Best Cross-Validation F1 Score: {best_f1:.4f}")
+        
+        # Save results to local file as backup
+        with open("hyperparameter_results.txt", "w", encoding="utf-8") as f:
+            f.write("Logistic Regression Hyperparameter Tuning Results\n")
+            f.write("=" * 50 + "\n")
+            f.write(f"Best Parameters: {best_params}\n")
+            f.write(f"Best F1 Score: {best_f1:.4f}\n")
+            f.write(f"MLflow Tracking: {'Remote (DagHub)' if dagshub_connected else 'Local (./mlruns)'}\n")
+        print("📄 Results saved to: hyperparameter_results.txt")
 
 
 # ==========================
 # Main Execution
 # ==========================
 if __name__ == "__main__":
-    (X_train, X_test, y_train, y_test), vectorizer = load_and_prepare_data("notebooks/data.csv")
-    train_and_log_model(X_train, X_test, y_train, y_test, vectorizer)
+    print("🚀 Starting Logistic Regression Hyperparameter Tuning")
+    print(f"📊 MLflow tracking: {'Remote (DagHub)' if dagshub_connected else 'Local (./mlruns)'}")
+    print("🔧 Grid Search Parameters: C=[0.1, 1, 10], penalty=['l1', 'l2'], solver=['liblinear']")
+    print("=" * 80)
+    
+    try:
+        (X_train, X_test, y_train, y_test), vectorizer = load_and_prepare_data("notebooks/data.csv")
+        print(f"📈 Data loaded - Train: {X_train.shape[0]} samples, Test: {X_test.shape[0]} samples")
+        print("🔄 Starting hyperparameter tuning...")
+        train_and_log_model(X_train, X_test, y_train, y_test, vectorizer)
+        print("\n✅ Hyperparameter tuning completed successfully!")
+    except Exception as e:
+        print(f"❌ Error during execution: {e}")
+        raise

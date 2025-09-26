@@ -151,14 +151,29 @@ def train_and_evaluate(df):
                         }
                         mlflow.log_metrics(metrics)
 
-                        # Log model
-                        # mlflow.sklearn.log_model(model, "model")
-                        input_example = X_test[:5] if not scipy.sparse.issparse(X_test) else X_test[:5].toarray()
-                        mlflow.sklearn.log_model(model, "model", input_example=input_example)
+                        # Log model with error handling
+                        try:
+                            # Try logging with input example for DagHub
+                            input_example = X_test[:5] if not scipy.sparse.issparse(X_test) else X_test[:5].toarray()
+                            mlflow.sklearn.log_model(model, "model", input_example=input_example)
+                        except Exception as model_log_error:
+                            print(f"⚠ Warning: Could not log model to remote tracking: {model_log_error}")
+                            try:
+                                # Fallback: Log model without input example
+                                mlflow.sklearn.log_model(model, "model")
+                            except Exception as fallback_error:
+                                print(f"⚠ Warning: Could not log model at all: {fallback_error}")
+                                # Continue without model logging
 
-                        # Print results for verification
-                        print(f"\nAlgorithm: {algo_name}, Vectorizer: {vec_name}")
-                        print(f"Metrics: {metrics}")
+                        # Print and save results for verification
+                        print(f"\n🔍 Algorithm: {algo_name}, Vectorizer: {vec_name}")
+                        print(f"📊 Metrics:")
+                        for metric_name, metric_value in metrics.items():
+                            print(f"   {metric_name}: {metric_value:.4f}")
+                        
+                        # Save results to local file as backup
+                        with open("experiment_results.txt", "a", encoding="utf-8") as f:
+                            f.write(f"{algo_name},{vec_name},{metrics['accuracy']:.4f},{metrics['precision']:.4f},{metrics['recall']:.4f},{metrics['f1_score']:.4f}\n")
 
                     except Exception as e:
                         print(f"Error in training {algo_name} with {vec_name}: {e}")
@@ -189,11 +204,16 @@ if __name__ == "__main__":
     print("🚀 Starting Sentiment Analysis Experiment: BoW vs TF-IDF")
     print(f"📊 MLflow tracking: {'Remote (DagHub)' if dagshub_connected else 'Local (./mlruns)'}")
     
+    # Initialize results file
+    with open("experiment_results.txt", "w", encoding="utf-8") as f:
+        f.write("Algorithm,Vectorizer,Accuracy,Precision,Recall,F1_Score\n")
+    
     try:
         df = load_data(CONFIG["data_path"])
         print(f"📈 Loaded {len(df)} samples")
         train_and_evaluate(df)
         print("✅ Experiment completed successfully!")
+        print("📄 Results also saved to: experiment_results.txt")
     except Exception as e:
         print(f"❌ Error during execution: {e}")
         raise

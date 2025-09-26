@@ -1,1 +1,4 @@
 myenv
+notebooks/data.csv
+notebooks/__pycache__/
+notebooks/IMDB.csv
