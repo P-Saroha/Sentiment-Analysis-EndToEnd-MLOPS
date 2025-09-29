@@ -1,43 +1,6 @@
-data_ingestion:data_ingestion:
+# params.yaml
+data_ingestion:
+  test_size: 0.25
 
-  test_size: 0.2  test_size: 0.2
-
-
-
-data_preprocessing:data_preprocessing:
-
-  text_column: 'review'  text_column: 'review'
-
-  target_column: 'sentiment'  target_column: 'sentiment'
-
-
-
-feature_engineering:feature_engineering:
-
-  max_features: 5000  max_features: 5000
-
-  vectorizer_type: 'bow'  # bag of words  vectorizer_type: 'bow'  # bag of words
-
-
-
-model_training:model_training:
-
-  model_type: 'logistic_regression'  model_type: 'logistic_regression'
-
-  random_state: 42  random_state: 42
-
-  test_size: 0.2  test_size: 0.2
-
-
-
-model_evaluation:model_evaluation:
-
-  metrics:  metrics:
-
-    - accuracy    - accuracy
-
-    - precision    - precision
-
-    - recall    - recall
-
-    - f1_score    - f1_score
+feature_engineering:
+  max_features: 50

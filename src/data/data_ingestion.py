@@ -9,7 +9,10 @@ from sklearn.model_selection import train_test_split
 import yaml
 import logging
 # from src.logger import logging  # Using standard logging instead
-from ..connections import s3_connection
+import sys
+import os
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..'))
+from src.connections import s3_connection
 
 
 def load_params(params_path: str) -> dict:
