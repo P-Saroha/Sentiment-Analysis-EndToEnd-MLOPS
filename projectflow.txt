@@ -282,3 +282,10 @@ What is a PVC?
 3. When a pod is deployed and needs storage, it will request the storage defined in the PVC.
 
 ----------------------------------------------------------------------------------
+
+
+
+
+
+
+## start with 35 mint
