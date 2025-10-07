@@ -59,7 +59,33 @@ def load_model_info(file_path: str) -> dict:
 def register_model(model_name: str, model_info: dict):
     """Register the model to the MLflow Model Registry (DagHub compatible)."""
     try:
-        model_uri = f"runs:/{model_info['run_id']}/{model_info['model_path']}"
+        run_id = model_info['run_id']
+        
+        # Check if this is a fallback run_id (when MLflow logging failed)
+        if run_id == "fallback_run_id":
+            logging.info("Fallback mode detected - skipping MLflow model registration")
+            print(f" Model '{model_name}' evaluation completed successfully!")
+            print("  MLflow model registration skipped due to DagHub limitations")
+            print(" Model saved locally at: models/model.pkl")
+            
+            # Load and display metrics from local files
+            try:
+                import json
+                with open('reports/metrics.json', 'r') as f:
+                    metrics = json.load(f)
+                print(f" Model Metrics:")
+                print(f"   Accuracy: {metrics.get('accuracy', 'N/A'):.4f}")
+                print(f"   Precision: {metrics.get('precision', 'N/A'):.4f}")
+                print(f"   Recall: {metrics.get('recall', 'N/A'):.4f}")
+                print(f"   AUC: {metrics.get('auc', 'N/A'):.4f}")
+            except Exception as e:
+                logging.warning(f"Could not load metrics: {e}")
+            
+            return None
+        
+        # Use MLflow run URI for real runs
+        model_uri = f"runs:/{run_id}/{model_info['model_path']}"
+        logging.info(f"Registering model with URI: {model_uri}")
         
         # Register the model (basic registration for DagHub compatibility)
         model_version = mlflow.register_model(model_uri, model_name)
