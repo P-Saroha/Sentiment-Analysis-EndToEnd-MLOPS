@@ -25,12 +25,27 @@ jobs:
 
       - name: install dependencies
         run: |
+          pip install --upgrade pip
           pip install -r requirements.txt
-          pip install dvc[s3]
           
       - name: Setup NLTK data
         run: |
-          python -c "import nltk; nltk.download('punkt'); nltk.download('stopwords'); nltk.download('wordnet')"
+          python -c "
+          import nltk
+          import ssl
+          try:
+              _create_unverified_https_context = ssl._create_unverified_context
+          except AttributeError:
+              pass
+          else:
+              ssl._create_default_https_context = _create_unverified_https_context
+          
+          nltk.download('punkt', quiet=True)
+          nltk.download('stopwords', quiet=True) 
+          nltk.download('wordnet', quiet=True)
+          nltk.download('omw-1.4', quiet=True)
+          print('✅ NLTK data downloaded successfully')
+          "
           
       - name: Verify DVC installation
         run: |
@@ -73,7 +88,11 @@ jobs:
           
       - name: Run tests
         run: |
-          python -m pytest tests/ -v || echo "No tests found or tests failed"
+          if [ -d "tests" ]; then
+            python -m pytest tests/ -v --tb=short
+          else
+            echo "No tests directory found, skipping tests"
+          fi
           
       - name: Validate model artifacts
         run: |
