@@ -68,10 +68,10 @@ def normalize_text(text):
 
     return text
 
-# Below code block is for local use
+# Below code block is for local use (disabled for Docker)
 # -------------------------------------------------------------------------------------
-mlflow.set_tracking_uri('https://dagshub.com/P-Saroha/Sentiment-Analysis-EndToEnd-MLOPS.mlflow')
-dagshub.init(repo_owner='P-Saroha', repo_name='Sentiment-Analysis-EndToEnd-MLOPS', mlflow=True)
+# mlflow.set_tracking_uri('https://dagshub.com/P-Saroha/Sentiment-Analysis-EndToEnd-MLOPS.mlflow')
+# dagshub.init(repo_owner='P-Saroha', repo_name='Sentiment-Analysis-EndToEnd-MLOPS', mlflow=True)
 # -------------------------------------------------------------------------------------
 
 # Below code block is for production use
