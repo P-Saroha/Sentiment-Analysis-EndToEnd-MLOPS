@@ -1,0 +1,140 @@
+# Git# Git
+
+.git.git
+
+.gitignore.gitignore
+
+.github
+
+# Python
+
+__pycache__# Python
+
+*.pyc__pycache__
+
+*.pyo*.pyc
+
+*.pyd*.pyo
+
+.Python*.pyd
+
+env.Python
+
+pip-log.txtenv
+
+pip-delete-this-directory.txtpip-log.txt
+
+.toxpip-delete-this-directory.txt
+
+.coverage.tox
+
+.coverage.*.coverage
+
+.cache.coverage.*
+
+nosetests.xml.cache
+
+coverage.xmlnosetests.xml
+
+*.covercoverage.xml
+
+*.log*.cover
+
+.pytest_cache/*.log
+
+.git
+
+# Virtual environments.mypy_cache
+
+myenv/.pytest_cache
+
+venv/.hypothesis
+
+.env
+
+# Virtual environments
+
+# Documentationmyenv/
+
+docs/venv/
+
+*.mdENV/
+
+README*env/
+
+.venv/
+
+# Development files
+
+.vscode/# Documentation
+
+.idea/docs/
+
+*.swp*.md
+
+*.swoREADME.md
+
+
+
+# Data files (if large)# IDE
+
+data/raw/.vscode/
+
+data/external/.idea/
+
+notebooks/*.swp
+
+logs/*.swo
+
+mlruns/*~
+
+
+
+# DVC files# OS
+
+.dvc/.DS_Store
+
+dvc.lock.DS_Store?
+
+.dvcignore._*
+
+.Spotlight*
+
+# CI/CD.Trashes
+
+.github/ehthumbs.db
+
+Thumbs.db
+
+# Local development
+
+local_s3/# Data files (not needed in container)
+
+experiment_results.txtnotebooks/
+
+hyperparameter_results.txtdata/external/
+
+*.tmpdata/interim/
+
+*.bakdata/raw/
+
+references/
+
+# OS files
+
+.DS_Store# Reports (generated during build)
+
+Thumbs.dbreports/figures/
+
+# Scripts and tests (not needed in production)
+scripts/
+tests/
+src/
+
+# DVC files
+.dvc/
+*.dvc
+
+# Misc
+*.log
+.env
