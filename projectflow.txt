@@ -71,7 +71,7 @@ dvc remote add -d myremote s3://newdatabucket2025
 	AWS_ACCESS_KEY_ID
 	AWS_SECRET_ACCESS_KEY
 	AWS_REGION
-	ECR_REPOSITORY (capstone-proj)
+	ECR_REPOSITORY (sentiment-analysis-project)
     AWS_ACCOUNT_ID
    (Also add this permission to the IAM user: AmazonEC2ContainerRegistryFullAccess)
 
