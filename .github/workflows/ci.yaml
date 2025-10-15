@@ -47,10 +47,10 @@ jobs:
           
           # Use faster requirements file for CI builds
           if [ "${{ env.FAST_BUILD }}" == "true" ]; then
-            echo "🚀 Fast build mode - using minimal requirements"
+            echo " Fast build mode - using minimal requirements"
             pip install --no-cache-dir -r requirements-ci.txt
           else
-            echo "🔍 Full build mode - installing all requirements"
+            echo " Full build mode - installing all requirements"
             pip install --no-cache-dir -r requirements.txt
           fi
           
@@ -95,11 +95,11 @@ jobs:
           import pickle
           try:
               model = pickle.load(open('models/model.pkl', 'rb'))
-              print('✅ Model loaded successfully')
+              print(' Model loaded successfully')
               vectorizer = pickle.load(open('models/vectorizer.pkl', 'rb'))
-              print('✅ Vectorizer loaded successfully')
+              print(' Vectorizer loaded successfully')
           except Exception as e:
-              print(f'❌ Model validation failed: {e}')
+              print(f' Model validation failed: {e}')
               exit(1)
           "
 
@@ -170,17 +170,17 @@ jobs:
           ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          echo "🎉 CI/CD Pipeline completed successfully!"
-          echo "📦 Docker image built and pushed to ECR:"
+          echo " CI/CD Pipeline completed successfully!"
+          echo " Docker image built and pushed to ECR:"
           echo "   Repository: $ECR_REGISTRY/$ECR_REPOSITORY"
           echo "   Tags: latest, $IMAGE_TAG"
           echo ""
-          echo "🚀 Next steps (manual):"
+          echo " Next steps (manual):"
           echo "   1. Create EKS cluster: eksctl create cluster --name flask-app-cluster --region ${{ secrets.AWS_REGION }}"
           echo "   2. Deploy to EKS: kubectl create deployment sentiment-app --image=$ECR_REGISTRY/$ECR_REPOSITORY:latest"
           echo "   3. Expose service: kubectl expose deployment sentiment-app --type=LoadBalancer --port=5000"
           echo ""
-          echo "💡 To enable automatic EKS deployment, uncomment the EKS deployment step in ci.yaml"
+          echo " To enable automatic EKS deployment, uncomment the EKS deployment step in ci.yaml"
 
       # ========================================
       # EKS DEPLOYMENT (COMMENTED OUT FOR NOW)

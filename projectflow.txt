@@ -98,12 +98,15 @@ If the path points to your Anaconda environment (e.g., C:\Users\Personal\anacond
 * Test if kubectl is properly installed: kubectl version --client
 
 
-* Download eksctl: Invoke-WebRequest -Uri "https://github.com/weaveworks/eksctl/releases/download/v0.158.0/eksctl_Windows_amd64.zip" -OutFile "eksctl.zip"
-* Extract eksctl: Expand-Archive -Path .\eksctl.zip -DestinationPath .
-* Move the extracted eksctl.exe file to C:\Windows\System32 or any folder in your system PATH: Move-Item -Path .\eksctl.exe -Destination "C:\Windows\System32\eksctl.exe"
+* Download eksctl: 
+  - Create tools directory: mkdir -p tools
+  - Download: Invoke-WebRequest -Uri "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_Windows_amd64.zip" -OutFile "tools/eksctl.zip"
+  - Extract: Expand-Archive -Path "tools/eksctl.zip" -DestinationPath "tools/" -Force
+  - Create alias: Set-Alias -Name eksctl -Value "F:\Sentiment-Analysis-EndToEnd-MLOPS\tools\eksctl.exe"
+  - Or use directly: .\tools\eksctl.exe version
 ----------------------------------------------------------------------------------
 * Verify AWS CLI: aws --version
-* Verify kubectl: kubectl version --client-
+* Verify kubectl: kubectl version --client
 * Verify eksctl: eksctl version
 ----------------------------------------------------------------------------------
 
