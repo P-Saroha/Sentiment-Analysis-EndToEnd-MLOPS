@@ -34,7 +34,7 @@ Value: [YOUR_AWS_ACCOUNT_ID]
 Description: Your AWS account ID
 
 Name: ECR_REPOSITORY
-Value: sentiment-analysis-app
+Value: sentiment-analysis-project
 Description: ECR repository name for Docker images
 
 Name: EKS_CLUSTER_NAME
