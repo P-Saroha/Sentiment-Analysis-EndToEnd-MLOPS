@@ -1,5 +1,12 @@
 name: MLOps CI/CD Pipeline
 
+# Required GitHub Secrets:
+# - CAPSTONE_TEST: DagHub token for MLflow tracking
+# - AWS_ACCESS_KEY_ID: AWS IAM user access key
+# - AWS_SECRET_ACCESS_KEY: AWS IAM user secret key  
+# - AWS_REGION: ap-south-1
+# - ECR_REPOSITORY: sentiment-analysis-project
+
 on:
   push:
     branches: [ main, develop ]
@@ -64,12 +71,12 @@ jobs:
           python -m pip install --upgrade pip setuptools wheel --no-cache-dir
           
           # Always use minimal requirements for CI - SPEED FIRST!
-          echo "🚀 ULTRA FAST build mode - using minimal test requirements"
+          echo " ULTRA FAST build mode - using minimal test requirements"
           pip install --no-cache-dir -r requirements-test.txt
           
           # Only install additional packages if doing full pipeline
           if [ "${{ github.ref }}" == "refs/heads/main" ]; then
-            echo "🔧 Main branch - installing additional CI requirements"
+            echo " Main branch - installing additional CI requirements"
             pip install --no-cache-dir dagshub boto3 mlflow-skinny nltk scipy
           fi
           
@@ -233,51 +240,111 @@ jobs:
           ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          echo " CI/CD Pipeline completed successfully!"
-          echo " Docker image built and pushed to ECR:"
+          echo "🎉 CI/CD Pipeline completed successfully!"
+          echo "📦 Docker image built and pushed to ECR:"
           echo "   Repository: $ECR_REGISTRY/$ECR_REPOSITORY"
           echo "   Tags: latest, $IMAGE_TAG"
           echo ""
-          echo " Next steps (manual):"
-          echo "   1. Create EKS cluster: eksctl create cluster --name flask-app-cluster --region ${{ secrets.AWS_REGION }}"
-          echo "   2. Deploy to EKS: kubectl create deployment sentiment-app --image=$ECR_REGISTRY/$ECR_REPOSITORY:latest"
-          echo "   3. Expose service: kubectl expose deployment sentiment-app --type=LoadBalancer --port=5000"
-          echo ""
-          echo " To enable automatic EKS deployment, uncomment the EKS deployment step in ci.yaml"
+          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            echo "🚀 EKS Deployment Status:"
+            echo "   Cluster: sentiment-analysis-cluster (ap-south-1)"
+            echo "   Namespace: sentiment-analysis"
+            echo "   Application: flask-app"
+            echo ""
+            echo "🔍 Check deployment status:"
+            echo "   kubectl get pods -n sentiment-analysis"
+            echo "   kubectl get svc flask-app-service -n sentiment-analysis"
+          else
+            echo "🏗️  Feature branch - EKS deployment skipped"
+            echo "   EKS deployment only runs on main branch"
+          fi
 
       # ========================================
-      # EKS DEPLOYMENT (COMMENTED OUT FOR NOW)
-      # Uncomment this section when ready to deploy to EKS
+      # EKS DEPLOYMENT (ENABLED)
+      # Deploys to sentiment-analysis-cluster in ap-south-1
       # ========================================
       
-      # - name: Deploy to EKS (DISABLED - uncomment when ready)
-      #   if: success() && github.ref == 'refs/heads/main'
-      #   env:
-      #     ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-      #     ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
-      #     IMAGE_TAG: ${{ github.sha }}
-      #     EKS_CLUSTER_NAME: ${{ secrets.EKS_CLUSTER_NAME }}
-      #   run: |
-      #     # Check if EKS cluster exists
-      #     if aws eks describe-cluster --name $EKS_CLUSTER_NAME --region ${{ secrets.AWS_REGION }} >/dev/null 2>&1; then
-      #       echo "EKS cluster $EKS_CLUSTER_NAME found, updating kubeconfig..."
-      #       aws eks update-kubeconfig --region ${{ secrets.AWS_REGION }} --name $EKS_CLUSTER_NAME
-      #       
-      #       # Check if deployment exists, create if not
-      #       if kubectl get deployment sentiment-app >/dev/null 2>&1; then
-      #         echo "Updating existing deployment..."
-      #         kubectl set image deployment/sentiment-app sentiment-app=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-      #         kubectl rollout status deployment/sentiment-app
-      #       else
-      #         echo "Creating new deployment..."
-      #         kubectl create deployment sentiment-app --image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-      #         kubectl expose deployment sentiment-app --type=LoadBalancer --port=5000 --target-port=5000 --name=sentiment-app-service
-      #         echo "Deployment created successfully!"
-      #       fi
-      #       
-      #       kubectl get pods
-      #       kubectl get services
-      #     else
-      #       echo "EKS cluster $EKS_CLUSTER_NAME not found, skipping EKS deployment"
-      #       echo "To deploy to EKS, create cluster first: eksctl create cluster --name $EKS_CLUSTER_NAME --region ${{ secrets.AWS_REGION }}"
-      #     fi
+      - name: Deploy to EKS
+        if: success() && github.ref == 'refs/heads/main'
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
+          IMAGE_TAG: ${{ github.sha }}
+          EKS_CLUSTER_NAME: sentiment-analysis-cluster
+          AWS_REGION: ap-south-1
+        run: |
+          echo "🚀 Starting EKS deployment to sentiment-analysis-cluster..."
+          
+          # Check if EKS cluster exists
+          if aws eks describe-cluster --name $EKS_CLUSTER_NAME --region $AWS_REGION >/dev/null 2>&1; then
+            echo "✅ EKS cluster $EKS_CLUSTER_NAME found, updating kubeconfig..."
+            aws eks update-kubeconfig --region $AWS_REGION --name $EKS_CLUSTER_NAME --alias prod-cluster
+            
+            # Verify kubectl connectivity
+            kubectl config use-context prod-cluster
+            kubectl cluster-info
+            
+            # Create namespace if it doesn't exist
+            kubectl create namespace sentiment-analysis --dry-run=client -o yaml | kubectl apply -f -
+            
+            # Create secrets for the application
+            echo "🔐 Creating/updating application secrets..."
+            kubectl create secret generic capstone-secret \
+              --from-literal=CAPSTONE_TEST="${{ secrets.CAPSTONE_TEST }}" \
+              --namespace=sentiment-analysis \
+              --dry-run=client -o yaml | kubectl apply -f -
+            
+            # Update deployment.yaml with correct image URI
+            echo "📝 Updating deployment.yaml with new image..."
+            sed -i "s|image:.*|image: $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG|g" deployment.yaml
+            
+            # Apply the deployment
+            echo "🚢 Applying deployment to EKS..."
+            kubectl apply -f deployment.yaml -n sentiment-analysis
+            
+            # Check if nodes are ready first
+            echo "🔍 Checking if EKS nodes are ready..."
+            NODE_COUNT=$(kubectl get nodes --no-headers 2>/dev/null | wc -l)
+            if [ "$NODE_COUNT" -eq 0 ]; then
+              echo "⏳ No nodes found, nodegroup may still be provisioning..."
+              echo "Waiting up to 10 minutes for nodes to be ready..."
+              timeout=600
+              while [ $timeout -gt 0 ] && [ "$(kubectl get nodes --no-headers 2>/dev/null | wc -l)" -eq 0 ]; do
+                echo "Still waiting for nodes... (${timeout}s remaining)"
+                sleep 30
+                timeout=$((timeout - 30))
+              done
+            fi
+            
+            # Wait for deployment to be ready
+            echo "⏳ Waiting for deployment to be ready..."
+            kubectl rollout status deployment/flask-app -n sentiment-analysis --timeout=600s
+            
+            # Get deployment status
+            echo "📊 Deployment Status:"
+            echo "Cluster nodes:"
+            kubectl get nodes
+            echo ""
+            echo "Pods in sentiment-analysis namespace:"
+            kubectl get pods -n sentiment-analysis -l app=flask-app -o wide
+            echo ""
+            echo "Services in sentiment-analysis namespace:"
+            kubectl get svc -n sentiment-analysis
+            
+            # Get LoadBalancer URL
+            echo "🌐 Getting LoadBalancer URL..."
+            EXTERNAL_IP=$(kubectl get svc flask-app-service -n sentiment-analysis -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+            if [ ! -z "$EXTERNAL_IP" ]; then
+              echo "🎉 Application deployed successfully!"
+              echo "🔗 Access your application at: http://$EXTERNAL_IP:5000"
+            else
+              echo "⏳ LoadBalancer is still provisioning. Check status with:"
+              echo "   kubectl get svc flask-app-service -n sentiment-analysis"
+            fi
+            
+          else
+            echo "❌ EKS cluster $EKS_CLUSTER_NAME not found in region $AWS_REGION"
+            echo "Please ensure the cluster is created first:"
+            echo "   eksctl create cluster --name $EKS_CLUSTER_NAME --region $AWS_REGION"
+            exit 1
+          fi
