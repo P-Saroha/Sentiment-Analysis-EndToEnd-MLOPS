@@ -70,18 +70,35 @@ jobs:
           # Only install additional packages if doing full pipeline
           if [ "${{ github.ref }}" == "refs/heads/main" ]; then
             echo "🔧 Main branch - installing additional CI requirements"
-            pip install --no-cache-dir dagshub boto3 mlflow-skinny
+            pip install --no-cache-dir dagshub boto3 mlflow-skinny nltk
           fi
           
-      - name: Download NLTK data (cached)
+      - name: Download NLTK data (main branch only)
+        if: github.ref == 'refs/heads/main'
         run: |
-          # Only download NLTK data if doing NLP processing
-          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
-            echo "📦 Main branch - downloading NLTK data..."
-            python -c "import nltk; import os; nltk_data_dir = os.path.expanduser('~/nltk_data'); nltk.download('punkt', quiet=True) if not os.path.exists(f'{nltk_data_dir}/tokenizers/punkt') else print('✅ NLTK data already cached'); nltk.download('stopwords', quiet=True)"
-          else
-            echo "⚡ Skipping NLTK download for fast CI"
-          fi
+          echo "📦 Main branch - downloading NLTK data..."
+          python -c "
+          import nltk
+          import os
+          
+          nltk_data_dir = os.path.expanduser('~/nltk_data')
+          if not os.path.exists(f'{nltk_data_dir}/tokenizers/punkt'):
+              print('Downloading punkt...')
+              nltk.download('punkt', quiet=True)
+          else:
+              print('✅ punkt already cached')
+              
+          if not os.path.exists(f'{nltk_data_dir}/corpora/stopwords'):
+              print('Downloading stopwords...')
+              nltk.download('stopwords', quiet=True) 
+          else:
+              print('✅ stopwords already cached')
+          "
+
+      - name: Skip NLTK for fast CI (feature branches)
+        if: github.ref != 'refs/heads/main'
+        run: |
+          echo "⚡ Feature branch - skipping NLTK download for ultra-fast CI"
 
       # DVC pipeline - DISABLED for faster CI (enable only for main branch)
       - name: Run DVC pipeline (conditional)
