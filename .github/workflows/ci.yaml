@@ -64,13 +64,13 @@ jobs:
           python -m pip install --upgrade pip setuptools wheel --no-cache-dir
           
           # Always use minimal requirements for CI - SPEED FIRST!
-          echo " ULTRA FAST build mode - using minimal test requirements"
-          pip install --no-deps --no-cache-dir -r requirements-test.txt
+          echo "🚀 ULTRA FAST build mode - using minimal test requirements"
+          pip install --no-cache-dir -r requirements-test.txt
           
           # Only install additional packages if doing full pipeline
           if [ "${{ github.ref }}" == "refs/heads/main" ]; then
-            echo " Main branch - installing additional CI requirements"
-            pip install --no-cache-dir dagshub boto3 mlflow-skinny nltk
+            echo "🔧 Main branch - installing additional CI requirements"
+            pip install --no-cache-dir dagshub boto3 mlflow-skinny nltk scipy
           fi
           
       - name: Download NLTK data (main branch only)
@@ -151,10 +151,10 @@ jobs:
         run: |
           ls -la models/
           if [ -f "models/model.pkl" ] && [ -f "models/vectorizer.pkl" ]; then
-            echo "✅ Model files found - validating..."
+            echo " Model files found - validating..."
             python -c "import pickle; model = pickle.load(open('models/model.pkl', 'rb')); print('✅ Model loaded successfully'); vectorizer = pickle.load(open('models/vectorizer.pkl', 'rb')); print('✅ Vectorizer loaded successfully')"
           else
-            echo "⚠️ Model files not found - DVC pipeline may have failed"
+            echo " Model files not found - DVC pipeline may have failed"
             echo "Checking models directory contents:"
             ls -la models/ || true
             echo "This is expected if DVC pipeline failed or skipped"
