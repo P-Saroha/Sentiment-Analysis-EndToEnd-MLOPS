@@ -77,18 +77,8 @@ jobs:
         run: |
           # Only download NLTK data if doing NLP processing
           if [ "${{ github.ref }}" == "refs/heads/main" ]; then
-            python -c "
-            import nltk
-            import os
-            
-            nltk_data_dir = os.path.expanduser('~/nltk_data')
-            if not os.path.exists(f'{nltk_data_dir}/tokenizers/punkt'):
-                print('📦 Downloading NLTK data...')
-                nltk.download('punkt', quiet=True)
-                nltk.download('stopwords', quiet=True) 
-            else:
-                print('✅ NLTK data already cached')
-            "
+            echo "📦 Main branch - downloading NLTK data..."
+            python -c "import nltk; import os; nltk_data_dir = os.path.expanduser('~/nltk_data'); nltk.download('punkt', quiet=True) if not os.path.exists(f'{nltk_data_dir}/tokenizers/punkt') else print('✅ NLTK data already cached'); nltk.download('stopwords', quiet=True)"
           else
             echo "⚡ Skipping NLTK download for fast CI"
           fi
