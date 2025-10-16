@@ -56,9 +56,10 @@ dvc remote add -d myremote s3://newdatabucket2025
 31. Add dir "tests"&"scripts" and files within. This will contain our test related scripts for CI.
 
 >>>>> Moving to Docker <<<<<
-32. pip install pipreqs
-33. cd flask_app & do "pipreqs . --force"
-34. Add dockerfile and start docker-desktop in background
+32. Requirements files (final structure):
+    - requirements.txt (production & deployment)
+    - requirements-test.txt (CI/CD ultra-fast builds)
+33. Add dockerfile and start docker-desktop in background
     Also before proceeding make sure: [switch the mlflow server setup to param version, change cmd on dockerfile]
 35. go to root dir and: "docker build -t capstone-app:latest ."
 36. Try running the image: "docker run -p 8888:5000 capstone-app:latest"
