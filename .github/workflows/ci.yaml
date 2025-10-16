@@ -109,32 +109,32 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ${{ secrets.AWS_REGION }}
         run: |
-          echo "🔧 Main branch - setting up DVC"
+          echo " Main branch - setting up DVC"
           
           # Install DVC and dependencies
           pip install dvc[s3] pandas joblib --no-cache-dir
           
           # Pull existing models from DVC remote first
-          echo "� Pulling models from DVC remote..."
+          echo " Pulling models from DVC remote..."
           dvc pull models/model.pkl models/vectorizer.pkl || {
-            echo "⚠️ DVC pull failed, trying to reproduce pipeline"
+            echo " DVC pull failed, trying to reproduce pipeline"
             
             # If pull fails, run the pipeline
-            echo "🚀 Running DVC reproduction pipeline:"
+            echo " Running DVC reproduction pipeline:"
             dvc repro -v || {
-              echo "❌ Both DVC pull and repro failed"
-              echo "📁 Current directory contents:"
+              echo " Both DVC pull and repro failed"
+              echo " Current directory contents:"
               ls -la
-              echo "📁 Models directory:"
+              echo " Models directory:"
               ls -la models/ || echo "No models directory"
-              echo "⚠️ Continuing CI without model validation"
+              echo " Continuing CI without model validation"
             }
           }
 
       - name: Skip DVC pipeline (feature branches)  
         if: github.ref != 'refs/heads/main'
         run: |
-          echo "⚡ Feature branch - skipping DVC pipeline for ultra-fast CI"
+          echo " Feature branch - skipping DVC pipeline for ultra-fast CI"
           echo "Model training only happens on main branch"
 
       - name: Run tests (optional - set SKIP_TESTS=true to skip)
@@ -152,17 +152,7 @@ jobs:
           ls -la models/
           if [ -f "models/model.pkl" ] && [ -f "models/vectorizer.pkl" ]; then
             echo "✅ Model files found - validating..."
-            python -c "
-            import pickle
-            try:
-                model = pickle.load(open('models/model.pkl', 'rb'))
-                print('✅ Model loaded successfully')
-                vectorizer = pickle.load(open('models/vectorizer.pkl', 'rb'))
-                print('✅ Vectorizer loaded successfully')
-            except Exception as e:
-                print(f'❌ Model validation failed: {e}')
-                exit(1)
-            "
+            python -c "import pickle; model = pickle.load(open('models/model.pkl', 'rb')); print('✅ Model loaded successfully'); vectorizer = pickle.load(open('models/vectorizer.pkl', 'rb')); print('✅ Vectorizer loaded successfully')"
           else
             echo "⚠️ Model files not found - DVC pipeline may have failed"
             echo "Checking models directory contents:"
@@ -173,7 +163,7 @@ jobs:
       - name: Skip model validation (feature branches)
         if: github.ref != 'refs/heads/main'
         run: |
-          echo "⚡ Feature branch - skipping model validation for fast CI"
+          echo " Feature branch - skipping model validation for fast CI"
           echo "Model training/validation only happens on main branch"
 
       - name: Promote model to production
