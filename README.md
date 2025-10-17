@@ -21,9 +21,9 @@
 ## � **What I Built**
 
 ### **🌐 My First Cloud Application**
-**Live Demo:** [http://a411ce29e025a4cdda5b02f5b7a541dd-1451511241.ap-south-1.elb.amazonaws.com:5000](http://a411ce29e025a4cdda5b02f5b7a541dd-1451511241.ap-south-1.elb.amazonaws.com:5000)
+**Previous Live Demo:** [http://a411ce29e025a4cdda5b02f5b7a541dd-1451511241.ap-south-1.elb.amazonaws.com:5000](http://a411ce29e025a4cdda5b02f5b7a541dd-1451511241.ap-south-1.elb.amazonaws.com:5000)
 
-**Status:** 🚀 **Actually Working!** - My sentiment analysis app running on AWS EKS
+**Status:** ⏸️ **Previously Live** - App was successfully running on AWS EKS but deactivated to manage costs
 
 ### **🏠 Local Development Version**
 **URL:** [http://localhost:5000](http://localhost:5000)
@@ -121,8 +121,8 @@
                                         └──────────────┘
                                                    │
                                                    ▼
-                                     🌍 MY LIVE APP!
-                             (Still can't believe it works)
+                                🌍 MY APP (Was Live!)
+                        (Successfully deployed, now deactivated)
 ```
 
 ---
@@ -491,21 +491,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-## 📞 **Connect With Me!**
 
-<div align="center">
-
-### **� Learning in Public - Let's Connect!**
-
-[![GitHub](https://img.shields.io/badge/GitHub-P--Saroha-181717?style=for-the-badge&logo=github)](https://github.com/P-Saroha)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-Learning%20MLOps-0A66C2?style=for-the-badge&logo=linkedin)](https://linkedin.com/in/your-profile)
-[![Email](https://img.shields.io/badge/Email-Questions%20Welcome-EA4335?style=for-the-badge&logo=gmail)](mailto:your.email@gmail.com)
-
-**⭐ If this helped you learn something new, please give it a star!**
-
-</div>
-
----
 
 ## 🤔 **Common Issues I Faced (You Might Too!)**
 
@@ -544,6 +530,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**🚀 Want to see what I built? [Check out my live app!](http://a411ce29e025a4cdda5b02f5b7a541dd-1451511241.ap-south-1.elb.amazonaws.com:5000)**
+**🚀 Want to see what I built? The app was successfully deployed on AWS EKS but is currently deactivated to manage costs.**
 
-*Still can't believe it actually works and is running on AWS! 🎉*
+*Still can't believe I got it working and deployed to production! 🎉*
