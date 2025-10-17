@@ -38,6 +38,17 @@ local_s3/
 notebooks/data.csv
 notebooks/IMDB.csv
 *.csv
+*.tsv
+*.json
+*.parquet
+*.feather
+*.arrow
+
+# Large data files (>100MB)
+*.dat
+*.db
+*.sqlite
+*.sqlite3
 
 # ========================================
 # GENERATED/TRAINED MODELS
@@ -48,6 +59,12 @@ models/
 *.h5
 *.pb
 *.onnx
+*.pt
+*.pth
+*.bin
+*.safetensors
+*.model
+*.weights
 
 # MLflow tracking
 mlruns/
@@ -126,7 +143,11 @@ results/
 # ========================================
 /data.dvc
 .dvc/tmp
+.dvc/cache
 .dvcignore
+
+# DVC remote cache
+.dvc/cache/files/
 
 # ========================================
 # PACKAGE MANAGERS
@@ -147,3 +168,35 @@ htmlcov/
 # TOOLS AND BINARIES (Large files)
 # ========================================
 tools/
+*.exe
+*.zip
+
+# ========================================
+# TEMPORARY DEPLOYMENT FILES
+# ========================================
+*-deployment.yaml
+simple-*.yaml
+test-*.yaml
+monitor-*.ps1
+manual_*.py
+
+# ========================================
+# LARGE FILES AND MEDIA
+# ========================================
+*.zip
+*.tar
+*.tar.gz
+*.rar
+*.7z
+*.mp4
+*.avi
+*.mov
+*.mkv
+*.pdf
+*.doc
+*.docx
+*.ppt
+*.pptx
+
+# Files larger than 100MB (GitHub limit)
+*.large
