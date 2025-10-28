@@ -1,4 +1,4 @@
-# # � My MLOps Learning Journey - Sentiment Analysis Pipeline
+ My MLOps Learning Journey - Sentiment Analysis Pipeline
 
 <div align="center">
   
