@@ -32,8 +32,8 @@ def setup_mlflow():
         print("✓ Connected to DagHub MLflow tracking")
         return True
     except Exception as e:
-        print(f"⚠ Failed to connect to DagHub: {e}")
-        print("📁 Falling back to local MLflow tracking")
+        print(f" Failed to connect to DagHub: {e}")
+        print(" Falling back to local MLflow tracking")
         # Fallback to local tracking
         mlflow.set_tracking_uri("file:./mlruns")
         mlflow.set_experiment("LoR Hyperparameter Tuning")
@@ -121,8 +121,8 @@ def train_and_log_model(X_train, X_test, y_train, y_test, vectorizer):
                 mlflow.log_params(params)
                 mlflow.log_metrics(metrics)
                 
-                print(f"🔍 Params: {params}")
-                print(f"📊 Accuracy: {metrics['accuracy']:.4f} | F1: {metrics['f1_score']:.4f} | CV Score: {mean_score:.4f} ± {std_score:.4f}")
+                print(f" Params: {params}")
+                print(f" Accuracy: {metrics['accuracy']:.4f} | F1: {metrics['f1_score']:.4f} | CV Score: {mean_score:.4f} ± {std_score:.4f}")
                 print("-" * 80)
 
         # Log the best model with error handling
@@ -136,13 +136,13 @@ def train_and_log_model(X_train, X_test, y_train, y_test, vectorizer):
         # Try to log the model with error handling
         try:
             mlflow.sklearn.log_model(best_model, "model")
-            print("✅ Model logged successfully to MLflow")
+            print(" Model logged successfully to MLflow")
         except Exception as model_log_error:
-            print(f"⚠ Warning: Could not log model to remote tracking: {model_log_error}")
-            print("📊 Metrics and parameters were still logged successfully")
+            print(f" Warning: Could not log model to remote tracking: {model_log_error}")
+            print(" Metrics and parameters were still logged successfully")
         
-        print(f"\n🏆 Best Hyperparameters: {best_params}")
-        print(f"🎯 Best Cross-Validation F1 Score: {best_f1:.4f}")
+        print(f"\n Best Hyperparameters: {best_params}")
+        print(f" Best Cross-Validation F1 Score: {best_f1:.4f}")
         
         # Save results to local file as backup
         with open("hyperparameter_results.txt", "w", encoding="utf-8") as f:
@@ -151,24 +151,24 @@ def train_and_log_model(X_train, X_test, y_train, y_test, vectorizer):
             f.write(f"Best Parameters: {best_params}\n")
             f.write(f"Best F1 Score: {best_f1:.4f}\n")
             f.write(f"MLflow Tracking: {'Remote (DagHub)' if dagshub_connected else 'Local (./mlruns)'}\n")
-        print("📄 Results saved to: hyperparameter_results.txt")
+        print(" Results saved to: hyperparameter_results.txt")
 
 
 # ==========================
 # Main Execution
 # ==========================
 if __name__ == "__main__":
-    print("🚀 Starting Logistic Regression Hyperparameter Tuning")
-    print(f"📊 MLflow tracking: {'Remote (DagHub)' if dagshub_connected else 'Local (./mlruns)'}")
-    print("🔧 Grid Search Parameters: C=[0.1, 1, 10], penalty=['l1', 'l2'], solver=['liblinear']")
+    print(" Starting Logistic Regression Hyperparameter Tuning")
+    print(f" MLflow tracking: {'Remote (DagHub)' if dagshub_connected else 'Local (./mlruns)'}")
+    print(" Grid Search Parameters: C=[0.1, 1, 10], penalty=['l1', 'l2'], solver=['liblinear']")
     print("=" * 80)
     
     try:
         (X_train, X_test, y_train, y_test), vectorizer = load_and_prepare_data("notebooks/data.csv")
-        print(f"📈 Data loaded - Train: {X_train.shape[0]} samples, Test: {X_test.shape[0]} samples")
-        print("🔄 Starting hyperparameter tuning...")
+        print(f" Data loaded - Train: {X_train.shape[0]} samples, Test: {X_test.shape[0]} samples")
+        print(" Starting hyperparameter tuning...")
         train_and_log_model(X_train, X_test, y_train, y_test, vectorizer)
-        print("\n✅ Hyperparameter tuning completed successfully!")
+        print("\n Hyperparameter tuning completed successfully!")
     except Exception as e:
-        print(f"❌ Error during execution: {e}")
+        print(f" Error during execution: {e}")
         raise

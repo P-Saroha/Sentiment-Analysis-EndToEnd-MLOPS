@@ -200,3 +200,5 @@ manual_*.py
 
 # Files larger than 100MB (GitHub limit)
 *.large
+
+/prep

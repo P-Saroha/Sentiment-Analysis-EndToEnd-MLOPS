@@ -14,7 +14,7 @@ sys.path.insert(0, os.path.abspath('.'))
 def run_pipeline_step(step_name, module_path):
     """Run a pipeline step and handle errors"""
     print(f"\n{'='*50}")
-    print(f"🚀 Running: {step_name}")
+    print(f" Running: {step_name}")
     print(f"{'='*50}")
     
     try:
@@ -22,14 +22,14 @@ def run_pipeline_step(step_name, module_path):
             sys.executable, '-m', module_path
         ], check=True, capture_output=True, text=True)
         
-        print(f"✅ {step_name} completed successfully!")
+        print(f" {step_name} completed successfully!")
         if result.stdout:
             print("Output:")
             print(result.stdout)
         return True
         
     except subprocess.CalledProcessError as e:
-        print(f"❌ {step_name} failed!")
+        print(f" {step_name} failed!")
         print(f"Error: {e}")
         if e.stdout:
             print("STDOUT:", e.stdout)
@@ -39,7 +39,7 @@ def run_pipeline_step(step_name, module_path):
 
 def main():
     """Run the complete ML pipeline"""
-    print("🎯 Starting Complete ML Pipeline")
+    print(" Starting Complete ML Pipeline")
     print("=" * 60)
     
     # Pipeline steps
@@ -62,13 +62,13 @@ def main():
             break
     
     print(f"\n{'='*60}")
-    print(f"📊 Pipeline Summary: {success_count}/{len(steps)} steps completed")
+    print(f" Pipeline Summary: {success_count}/{len(steps)} steps completed")
     
     if success_count == len(steps):
-        print("🎉 Complete ML Pipeline executed successfully!")
-        print("🔗 Check your MLflow dashboard at: https://dagshub.com/P-Saroha/Sentiment-Analysis-EndToEnd-MLOPS.mlflow")
+        print(" Complete ML Pipeline executed successfully!")
+        print(" Check your MLflow dashboard at: https://dagshub.com/P-Saroha/Sentiment-Analysis-EndToEnd-MLOPS.mlflow")
     else:
-        print("⚠️  Pipeline completed with some issues.")
+        print("  Pipeline completed with some issues.")
     
     print(f"{'='*60}")
 

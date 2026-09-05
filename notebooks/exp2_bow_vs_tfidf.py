@@ -42,11 +42,11 @@ def setup_mlflow():
         mlflow.set_tracking_uri(CONFIG["mlflow_tracking_uri"])
         dagshub.init(repo_owner=CONFIG["dagshub_repo_owner"], repo_name=CONFIG["dagshub_repo_name"], mlflow=True)
         mlflow.set_experiment(CONFIG["experiment_name"])
-        print("✓ Connected to DagHub MLflow tracking")
+        print("✓\ Connected to DagHub MLflow tracking")
         return True
     except Exception as e:
-        print(f"⚠ Failed to connect to DagHub: {e}")
-        print("📁 Falling back to local MLflow tracking")
+        print(f" Failed to connect to DagHub: {e}")
+        print(" Falling back to local MLflow tracking")
         # Fallback to local tracking
         mlflow.set_tracking_uri("file:./mlruns")
         mlflow.set_experiment(CONFIG["experiment_name"])
@@ -166,8 +166,8 @@ def train_and_evaluate(df):
                                 # Continue without model logging
 
                         # Print and save results for verification
-                        print(f"\n🔍 Algorithm: {algo_name}, Vectorizer: {vec_name}")
-                        print(f"📊 Metrics:")
+                        print(f"\n Algorithm: {algo_name}, Vectorizer: {vec_name}")
+                        print(f" Metrics:")
                         for metric_name, metric_value in metrics.items():
                             print(f"   {metric_name}: {metric_value:.4f}")
                         
@@ -201,8 +201,8 @@ def log_model_params(algo_name, model):
 
 # ========================== EXECUTION ==========================
 if __name__ == "__main__":
-    print("🚀 Starting Sentiment Analysis Experiment: BoW vs TF-IDF")
-    print(f"📊 MLflow tracking: {'Remote (DagHub)' if dagshub_connected else 'Local (./mlruns)'}")
+    print(" Starting Sentiment Analysis Experiment: BoW vs TF-IDF")
+    print(f" MLflow tracking: {'Remote (DagHub)' if dagshub_connected else 'Local (./mlruns)'}")
     
     # Initialize results file
     with open("experiment_results.txt", "w", encoding="utf-8") as f:
@@ -210,10 +210,10 @@ if __name__ == "__main__":
     
     try:
         df = load_data(CONFIG["data_path"])
-        print(f"📈 Loaded {len(df)} samples")
+        print(f" Loaded {len(df)} samples")
         train_and_evaluate(df)
-        print("✅ Experiment completed successfully!")
-        print("📄 Results also saved to: experiment_results.txt")
+        print(" Experiment completed successfully!")
+        print(" Results also saved to: experiment_results.txt")
     except Exception as e:
-        print(f"❌ Error during execution: {e}")
+        print(f" Error during execution: {e}")
         raise
